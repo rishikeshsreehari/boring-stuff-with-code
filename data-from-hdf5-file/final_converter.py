@@ -3,7 +3,7 @@
 """
 Created on Mon Nov  7 23:31:16 2022
 
-@author: Admin
+@author: Rishikesh Sreehari
 """
 
 import h5py
