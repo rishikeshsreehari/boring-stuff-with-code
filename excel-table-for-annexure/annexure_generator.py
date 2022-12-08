@@ -14,11 +14,20 @@ import xlsxwriter as xl
 
 
 
-res_data=pd.read_excel(r'C:\Users\Admin\Desktop\Demand_consolidated.xlsx','res_consolidated',index_col=0)
-ser_data=pd.read_excel(r'C:\Users\Admin\Desktop\Demand_consolidated.xlsx','ser_consolidated',index_col=0)                       
-ag_data=pd.read_excel(r'C:\Users\Admin\Desktop\Demand_consolidated.xlsx','ag_consolidated',index_col=0)   
-ind_data=pd.read_excel(r'C:\Users\Admin\Desktop\Demand_consolidated.xlsx','ind_consolidated',index_col=0)                      
-                       
+res_bau_data=pd.read_excel(r'annexure.xlsx','res_bau',index_col=0)
+res_hgr_data=pd.read_excel(r'annexure.xlsx','res_hgr',index_col=0)
+
+ind_bau_data=pd.read_excel(r'annexure.xlsx','ind_bau',index_col=0)
+ind_hgr_data=pd.read_excel(r'annexure.xlsx','ind_hgr',index_col=0)
+
+agri_bau_data=pd.read_excel(r'annexure.xlsx','agri_bau',index_col=0)
+agri_hgr_data=pd.read_excel(r'annexure.xlsx','agri_hgr',index_col=0)
+
+ser_bau_data=pd.read_excel(r'annexure.xlsx','ser_bau',index_col=0)
+ser_hgr_data=pd.read_excel(r'annexure.xlsx','ser_hgr',index_col=0)
+
+
+                      
 
 state_reg_dict = {'Telangana':'SR', 'Andaman & Nicobar Island':'SR', 'Andhra Pradesh':'SR',
 
@@ -48,33 +57,50 @@ regions = set(state_reg_dict.values())
 #     print(column)
 
 #%%
-states = ind_data.columns[:-1]
+states = ind_bau_data.columns[:-1]
 years = ['2024-25', '2026-27', '2029-30']
 
 #%%
 
 list_bau_all_states = {}
+list_hgr_all_states = {}
 
 
 
 
 
-for state in states:
+
+
+for state in states:  
     
-    df_format = pd.DataFrame(index=['Agriculture','Services','industry','Residential'],columns=['2024-25','2026-27','2029-30'])
-   
+    df_format=pd.DataFrame(index=['Agriculture','Services','industry','Residential'],columns=['2024-25','2026-27','2029-30'])
     for y in years:
     
-    
-
-        df_format.loc['industry',y] = ind_data[state].loc[y]
-        df_format.loc['Agriculture',y] = ag_data[state].loc[y]
-        df_format.loc['Services',y] = ser_data[state].loc[y]
-        df_format.loc['Residential',y] = res_data[state].loc[y]
+        df_format.loc['industry',y] = ind_bau_data[state].loc[y]
+        df_format.loc['Agriculture',y] = agri_bau_data[state].loc[y]
+        df_format.loc['Services',y] = ser_bau_data[state].loc[y]
+        df_format.loc['Residential',y] = res_bau_data[state].loc[y]
         
     list_bau_all_states[state]=df_format
     
-writer = pd.ExcelWriter("rishi.xlsx")
+    
+    
+for state in states:  
+    
+    df_format=pd.DataFrame(index=['Agriculture','Services','industry','Residential'],columns=['2024-25','2026-27','2029-30'])
+    for y in years:
+    
+        df_format.loc['industry',y] = ind_hgr_data[state].loc[y]
+        df_format.loc['Agriculture',y] = agri_hgr_data[state].loc[y]
+        df_format.loc['Services',y] = ser_hgr_data[state].loc[y]
+        df_format.loc['Residential',y] = res_hgr_data[state].loc[y]
+        
+    list_hgr_all_states[state]=df_format
+
+    
+    
+    
+writer = pd.ExcelWriter("output.xlsx")
 
 
 
@@ -95,7 +121,7 @@ merge_format = workbook.add_format({
     'bold':     True,
     'border':   1,
     'align':    'center',
-    'valign':   'vcenter',
+    'valign':   'vcenter'
     #'fg_color': '#D7E4BC',
 })
 
@@ -122,9 +148,9 @@ for states in list_bau_all_states:
 
 row_value=3
   
-for states in list_bau_all_states:
+for states in list_hgr_all_states:
   temp=pd.DataFrame()
-  temp= list_bau_all_states[states]
+  temp= list_hgr_all_states[states]
   temp.to_excel(writer, sheet_name='Sheet1',startrow=row_value,startcol=4,index=False) 
   worksheet = writer.sheets['Sheet1']
   worksheet.conditional_format(row_value,4, row_value+4, 7,  {'type': 'no_blanks','format': format})
@@ -132,16 +158,16 @@ for states in list_bau_all_states:
   row_value = row_value + 10
   
   
-row_value=3
+# row_value=3
   
-for states in list_bau_all_states:
-  temp=pd.DataFrame()
-  temp= list_bau_all_states[states]
-  temp.to_excel(writer, sheet_name='Sheet1',startrow=row_value,startcol=7,index=False)
-  worksheet = writer.sheets['Sheet1']
-  worksheet.conditional_format(row_value,7, row_value+4, 10,  {'type': 'no_blanks','format': format})
-  worksheet.merge_range(row_value-1, 7, row_value-1, 9, 'Historical Growth Rate',merge_format)
-  row_value = row_value + 10
+# for states in list_bau_all_states:
+#   temp=pd.DataFrame()
+#   temp= list_bau_all_states[states]
+#   temp.to_excel(writer, sheet_name='Sheet1',startrow=row_value,startcol=7,index=False)
+#   worksheet = writer.sheets['Sheet1']
+#   worksheet.conditional_format(row_value,7, row_value+4, 10,  {'type': 'no_blanks','format': format})
+#   worksheet.merge_range(row_value-1, 7, row_value-1, 9, 'Historical Growth Rate',merge_format)
+#   row_value = row_value + 10
 
 
 writer.save()
