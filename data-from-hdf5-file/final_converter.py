@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Dec  8 15:15:14 2022
-
-@author: Rishikesh Sreehari
-"""
 
 # -*- coding: utf-8 -*-
 """
@@ -15,10 +9,17 @@ Created on Mon Nov  7 23:31:16 2022
 import h5py
 import numpy as np
 import pandas as pd
+import time
+from pyproj import Proj, transform
+
 #import geopandas as gpd
 
 
 #%%
+start_time = time.time()
+
+
+
 f = h5py.File('mer.h5', 'r')
 
 for key in f.keys():
@@ -60,7 +61,6 @@ Y_1 = pd.DataFrame(Y)
 
 
 
-
 #%%
 
 ## Copied the values from array to a dataframe
@@ -93,7 +93,10 @@ for y in range(len(Y_1)):
         final.loc[k,'Y'] = Y_1[0][y]
         final.loc[k,'GHI'] = data_df.iloc[y,x]
         k=k+1
-        # print(k)
+        print(k)
         
         
-        
+print("--- %s seconds ---" % (time.time() - start_time))
+
+
+
