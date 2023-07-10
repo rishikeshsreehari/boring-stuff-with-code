@@ -5,10 +5,12 @@ Repalce 'YOUR_EMAIL' with the email where you want the results to be.
 Requires permission to access your gmail for reading inbox and sending email!
 
 Tested for 2200 unread emails!
+Also ensure that the number of threads are always less than unread emails in your inbox
 
 Here's the sample output you will see in your Gmail:
 
 Update this value if you want any labels to be excluded:
 labelToExclude = "to-read-newsletters
+
 
 ![image](https://github.com/rishikeshsreehari/boring-stuff-with-code/assets/14956650/573e56c8-49ab-4a56-85d6-9e2df16a6ae3)
