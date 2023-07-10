@@ -1,16 +1,23 @@
 function groupUnreadEmailsBySenderAndSendEmail() {
-  var totalThreads = 2200; // Total number of threads to retrieve
+  var totalThreads = 2000; // Total number of threads to retrieve
   var batchSize = 50; // Number of threads to process per batch
   var processedThreads = 0; // Counter for processed threads
   var senders = {};
 
+  var labelToExclude = "to-read-newsletters"; // Replace "LabelName" with the label you want to exclude
+
   while (processedThreads < totalThreads) {
     var remainingThreads = totalThreads - processedThreads;
     var batchCount = Math.min(batchSize, remainingThreads);
-    var threads = GmailApp.getInboxThreads(processedThreads, batchCount);
+
+    // Build the search query excluding the label
+    var searchQuery = 'is:unread -label:' + labelToExclude;
+
+    var threads = GmailApp.search(searchQuery, processedThreads, batchCount);
 
     for (var i = 0; i < threads.length; i++) {
-      var sender = threads[i].getMessages()[0].getFrom();
+      var messages = threads[i].getMessages();
+      var sender = messages[0].getFrom();
 
       if (sender in senders) {
         senders[sender]++;
@@ -21,10 +28,6 @@ function groupUnreadEmailsBySenderAndSendEmail() {
 
     processedThreads += threads.length;
     Logger.log("Processed " + processedThreads + " out of " + totalThreads + " threads");
-    
-    if (threads.length < batchCount) {
-      break; // Exit the loop if there are no more threads to process
-    }
   }
 
   var sortedSenders = Object.entries(senders).sort((a, b) => b[1] - a[1]);
