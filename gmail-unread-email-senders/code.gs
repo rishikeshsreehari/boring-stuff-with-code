@@ -1,30 +1,23 @@
-function format(sender, threadCount) {
-  return sender + ": " + threadCount + " unread emails";
-}
-
-function sendEmail(content, recipientEmail) {
-  var subject = "Gmail Senders";
-  var body = content;
-  MailApp.sendEmail(recipientEmail, subject, body);
-}
-
-function myFunction() {
-  var startThread = 0;
-  var stepSize = 50; // This is the step size. Vary it accordingly based on the number of emails you have!
+function groupUnreadEmailsBySenderAndSendEmail() {
+  var totalThreads = 2000; // Total number of threads to retrieve
+  var batchSize = 50; // Number of threads to process per batch
+  var processedThreads = 0; // Counter for processed threads
   var senders = {};
 
-  while (true) {
-    var threads = GmailApp.getInboxThreads(
-      startThread,
-      stepSize
-    );
+  var labelToExclude = "to-read-newsletters"; // Replace "LabelName" with the label you want to exclude
 
-    if (threads.length === 0) {
-      break;
-    }
+  while (processedThreads < totalThreads) {
+    var remainingThreads = totalThreads - processedThreads;
+    var batchCount = Math.min(batchSize, remainingThreads);
 
-    for (var j = 0; j < threads.length; j++) {
-      var sender = threads[j].getMessages()[0].getFrom();
+    // Build the search query excluding the label
+    var searchQuery = 'is:unread -label:' + labelToExclude;
+
+    var threads = GmailApp.search(searchQuery, processedThreads, batchCount);
+
+    for (var i = 0; i < threads.length; i++) {
+      var messages = threads[i].getMessages();
+      var sender = messages[0].getFrom();
 
       if (sender in senders) {
         senders[sender]++;
@@ -33,19 +26,24 @@ function myFunction() {
       }
     }
 
-    startThread += threads.length;
-    Logger.log("Done until " + startThread);
+    processedThreads += threads.length;
+    Logger.log("Processed " + processedThreads + " out of " + totalThreads + " threads");
   }
 
   var sortedSenders = Object.entries(senders).sort((a, b) => b[1] - a[1]);
+
   var content = "";
   for (var i = 0; i < sortedSenders.length; i++) {
     var sender = sortedSenders[i][0];
-    var threadCount = sortedSenders[i][1];
-    content += format(sender, threadCount) + "\n";
+    var emailCount = sortedSenders[i][1];
+    content += sender + " - " + emailCount + " emails\n";
   }
 
-  var recipientEmail = "YOUR EMAIL"; // Update with the desired recipient email address
-  sendEmail(content, recipientEmail);
-  Logger.log("Finished!");
+  var recipientEmail = "YOUR_EMAIL"; // Update with the desired recipient email address
+  var subject = "Grouped Unread Emails (Sorted)";
+  var body = content;
+
+  // Send the email
+  GmailApp.sendEmail(recipientEmail, subject, body);
+  Logger.log("Email sent to " + recipientEmail);
 }
