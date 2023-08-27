@@ -1,3 +1,5 @@
+# List of Abbreviations from a Document
+
 The code.py reads a doc file and checks for any abbreviations present in the document.The code an be used to create
 list of abbreviations from a large document. The output printed is sorted and are unique.
 
